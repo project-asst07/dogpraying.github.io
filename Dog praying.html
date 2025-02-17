@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta http-equiv=”refresh” content=”0;url=http://dogpraying.com” />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>狗狗開運祈福</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #ffe4b5;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        #preview {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: none;
+            margin-bottom: 10px;
+        }
+        .card {
+            border: 2px solid #ff9800;
+            padding: 15px;
+            background-color: white;
+            display: inline-block;
+            border-radius: 10px;
+            margin: 10px;
+        }
+        .btn {
+            padding: 10px 15px;
+            margin: 10px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #allBlessings {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>狗狗開運祈福</h1>
+        <input type="file" id="upload" accept="image/*">
+        <img id="preview" src="" alt="狗狗照片">
+        <input type="text" id="dogName" placeholder="輸入狗狗名字">
+        <input type="text" id="wish" placeholder="輸入願望">
+        <button class="btn" onclick="generateCard()">生成祈福卡</button>
+        <div id="result"></div>
+        <h2>大家的祈福卡</h2>
+        <div id="allBlessings"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadBlessings);
+
+        document.getElementById('upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function generateCard() {
+            const dogName = document.getElementById('dogName').value;
+            const wish = document.getElementById('wish').value;
+            const imgSrc = document.getElementById('preview').src;
+            if (!dogName || !wish || imgSrc === '') {
+                alert('請上傳照片並輸入名字與願望！');
+                return;
+            }
+            
+            const cardHTML = `
+                <div class='card'>
+                    <img src="${imgSrc}" width="200" height="200" style="border-radius: 10px;" />
+                    <h3>${dogName} 的祈福卡</h3>
+                    <p>願望：${wish}</p>
+                    <button class='btn' onclick='bless(this)'>祝福（❤️ <span class="blessCount">0</span>）</button>
+                </div>
+            `;
+            
+            document.getElementById('result').innerHTML = cardHTML;
+            document.getElementById('allBlessings').innerHTML += cardHTML;
+            saveBlessing(cardHTML);
+        }
+
+        function bless(button) {
+            let countSpan = button.querySelector('.blessCount');
+            let count = parseInt(countSpan.innerText);
+            count++;
+            countSpan.innerText = count;
+        }
+
+        function saveBlessing(cardHTML) {
+            let blessings = JSON.parse(localStorage.getItem("blessings")) || [];
+            blessings.push(cardHTML);
+            localStorage.setItem("blessings", JSON.stringify(blessings));
+        }
+
+        function loadBlessings() {
+            let blessings = JSON.parse(localStorage.getItem("blessings")) || [];
+            document.getElementById('allBlessings').innerHTML = blessings.join('');
+        }
+    </script>
+</body>
+</html>
